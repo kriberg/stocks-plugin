@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load static from staticfiles %}
+
+{% block headtitle %}{% trans 'Stocks' %} {{ fit.name }}{% endblock %}
+
+
+{% block main_content %}
+<div class="page-header">
+    <h1>{{ fit }}</h1>
+    {{ fit.group.location }}
+</div>
+
+<dl>
+    <dt>Correctly fitted:</dt>
+    {% for ship in matching %} 
+    <dd>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %}</dd>
+    {% empty %}
+    <dd>No ships fitted correctly</dd>
+    {% endfor %}
+    <dt>Misfitted:</dt>
+    {% for ship, missing_items in misfits %}
+    <dd>
+    <dl>
+        
+        <dt>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %} @ {{ ship.hangarID }}</dt>
+        <dd>
+            <dl>
+                <dt>Missing:</dt>
+                {% for item, quantity in missing_items %}
+                <dd>{{ quantity }}x {{ item }}</dd>
+                {% endfor %}
+            </dl>
+        </dd>
+    </dd>
+    </dl>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load static from staticfiles %}
+{% load humanize %}
+
+{% block headtitle %}{% trans 'Stocks' %}{% endblock %}
+
+
+{% block main_content %}
+<div class="page-header">
+{% block title %}<h1>{% trans 'Stocks' %}</h1>{% endblock %}
+</div>
+{% for group in groups %}
+<p>
+    <h3>{{ group.name }}
+        <small>{{ group.location }}</small>
+    </h3>
+    <ul>
+        {% for fit in group.fits %}
+        <li>
+            {% if fit.fully_stocked %}
+            <div class="btn btn-mini btn-success">Ok</div>
+            {% else %}
+            <div class="btn btn-mini btn-warning">Missing</div>
+            {% endif %}
+            <a href="{% url "ecm.plugins.stocks.views.fitting" fit.pk %}">{{ fit.name }}</a> ({{ fit.stock_description }})
+        </li>
+        {% endfor %}
+        {% for item in group.items %}
+        <li>
+            {% if item.fully_stocked %}
+            <div class="btn btn-mini btn-success">Ok</div>
+            {% else %}
+            <div class="btn btn-mini btn-warning">Missing</div>
+            {% endif %}
+            {{ item.eve_type }} ({{ item.stock_level|intcomma }}/{{ item.desired_level|intcomma }})
+        </li>
+        {% endfor %}
+    </ul>
+</p>
+{% endfor %}
+<script type="text/javascript">
+    $("a.tooltip").tooltip({placement: 'right'});
+</script>
+{% endblock %}
