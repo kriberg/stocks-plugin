@@ -12,29 +12,49 @@
     {{ fit.group.location }}
 </div>
 
-<dl>
-    <dt>Correctly fitted:</dt>
-    {% for ship in matching %} 
-    <dd>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %}</dd>
-    {% empty %}
-    <dd>No ships fitted correctly</dd>
-    {% endfor %}
-    <dt>Misfitted:</dt>
-    {% for ship, missing_items in misfits %}
-    <dd>
+<div class="span4">
+    <h3>Ships</h3>
     <dl>
-        
-        <dt>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %} @ {{ ship.hangarID }}</dt>
+        <dt>Correctly fitted:</dt>
+        {% for ship in matching %} 
+        <dd>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %}</dd>
+        {% empty %}
+        <dd>No ships fitted correctly</dd>
+        {% endfor %}
+        <dt>Misfitted:</dt>
+        {% for ship, missing_items, hangar in misfits %}
         <dd>
-            <dl>
-                <dt>Missing:</dt>
-                {% for item, quantity in missing_items %}
-                <dd>{{ quantity }}x {{ item }}</dd>
-                {% endfor %}
-            </dl>
+        <dl>
+            
+            <dt>{% if ship.name %}{{ ship.name }}{% else %}<i>Unnamed</i>{% endif %} @ {{ hangar }}</dt>
+            <dd>
+                <dl>
+                    <dt>Missing:</dt>
+                    {% for item, quantity in missing_items %}
+                    <dd>{{ quantity }}x {{ item }}</dd>
+                    {% endfor %}
+                </dl>
+            </dd>
         </dd>
-    </dd>
-    </dl>
-    {% endfor %}
-</ul>
+        </dl>
+        {% endfor %}
+    </ul>
+</div>
+<div class="span4">
+    {% if fit.note %}
+    <h3>Notes</h3>
+    <pre>{{ fit.note }}</pre>
+    {% endif %}
+    <h3>Total missing items</h3>
+    <table class="table">
+        <tr>
+            <th>Item</th><th>Missing</th><th>Stocked in station</th>
+        </tr>
+        {% for item, quantity in fit.accumulate_missing_items.items %}
+        <tr>
+            <td>{{ item }}</td><td>{{ quantity.missing }}</td><td>{{ quantity.stocked }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}

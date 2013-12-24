@@ -22,9 +22,11 @@ import logging
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext as Ctx
+from django import template
 
 from ecm.views.decorators import check_user_access
-from ecm.plugins.stocks.models import Group, Fitting
+from ecm.apps.corp.models import CorpHangar, Corporation
+from ext_plugins.stocks.models import Group, Fitting
 
 LOG = logging.getLogger(__name__)
 
@@ -46,3 +48,4 @@ def fitting(request, fitting_id):
         'matching': matching,
         'misfits': misfits,
         }, Ctx(request))
+

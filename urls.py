@@ -20,7 +20,7 @@ __author__ = "vittoros"
 
 from django.conf.urls.defaults import patterns
 
-urlpatterns = patterns('ecm.plugins.stocks.views',
+urlpatterns = patterns('ext_plugins.stocks.views',
     (r'^$', 'home'),
     (r'^fitting/(?P<fitting_id>\d+)$', 'fitting'),
 )

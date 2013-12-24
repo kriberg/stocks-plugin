@@ -79,6 +79,7 @@ class Group(models.Model):
         except Hangar.DoesNotExist:
             return self.hangarID
 
+#------------------------------------------------------------------------------
 class Item(models.Model):
     group = models.ForeignKey(Group)
     eve_type = softfk.SoftForeignKey(to='eve.Type')
@@ -102,12 +103,14 @@ class Item(models.Model):
         return self.stock_level() >= self.desired_level
 
 
+#------------------------------------------------------------------------------
 class Fitting(models.Model):
     group = models.ForeignKey(Group)
     name = models.CharField(max_length=255)
     ship_type = softfk.SoftForeignKey(to='eve.Type')
     desired_level = models.IntegerField(default=0)
     eft_export = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
     matching_fuzz = models.IntegerField(default=0, help_text='How many \
             modules that can be off when matching.')
 
@@ -141,7 +144,9 @@ class Fitting(models.Model):
             if overlap >= (modulecount - self.matching_fuzz):
                 matching_ships.append(ship.pk)
             else:
-                misfitted_ships.append((ship, missing_items))
+                misfitted_ships.append((ship, missing_items,
+                    Hangar.objects.get(hangarID=ship.hangarID).get_name( \
+                            Corporation.objects.mine())))
             LOG.debug('{0} {1} matched {2}/{3}-{4} modules.'.format(
                 ship.eve_type, ship.pk, overlap, modulecount, self.matching_fuzz))
         LOG.debug('Found {0} matching ships'.format(len(matching_ships)))
@@ -176,3 +181,22 @@ class Fitting(models.Model):
             else:
                 items.append((eve_type, quantity))
         return ship_type, items
+
+    def accumulate_missing_items(self):
+        matching, misfits = self.find_ships()
+        total_missing_modules = {}
+
+        for ship, missing_items, hangar in misfits:
+            print missing_items
+            for item, quantity in missing_items:
+                if not item.pk in total_missing_modules:
+                    total_missing_modules[item] = {'missing': 0,
+                            'stocked': 0}
+                total_missing_modules[item]['missing'] += quantity
+        for item_key in total_missing_modules.keys():
+            items = Asset.objects.filter(stationID=self.group.stationID,
+                    eve_type=item_key, singleton=False)
+            aggregated = items.aggregate(models.Sum('quantity'))
+            if aggregated['quantity__sum']:
+                total_missing_modules[item]['stocked'] = aggregated['quantity__sum']
+        return total_missing_modules

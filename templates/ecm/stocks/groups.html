@@ -24,7 +24,7 @@
             {% else %}
             <div class="btn btn-mini btn-warning">Missing</div>
             {% endif %}
-            <a href="{% url "ecm.plugins.stocks.views.fitting" fit.pk %}">{{ fit.name }}</a> ({{ fit.stock_description }})
+            <a href="{% url "ext_plugins.stocks.views.fitting" fit.pk %}">{{ fit.name }}</a> ({{ fit.stock_description }})
         </li>
         {% endfor %}
         {% for item in group.items %}

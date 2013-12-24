@@ -22,7 +22,7 @@ __author__ = "vittoros"
 from django.contrib import admin
 from django.db.models import Q
 from django import forms
-from ecm.plugins.stocks.models import Item, Fitting, Group
+from ext_plugins.stocks.models import Item, Fitting, Group
 from ecm.apps.eve.models import Type, CelestialObject
 from ecm.apps.corp.models import CorpHangar
 
