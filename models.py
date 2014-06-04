@@ -29,6 +29,8 @@ from ecm.plugins.assets.models import Asset
 from ecm.apps.eve.models import Type, CelestialObject
 from ecm.apps.corp.models import Hangar, Corporation
 
+from pprint import pprint
+
 LOG = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------
@@ -136,7 +138,9 @@ class Fitting(models.Model):
             overlap = 0
             missing_items = []
             for item, quantity in items:
-                num_fitted = contents.filter(eve_type=item).count()
+                num_fitted = 0
+                for contained_item in contents.filter(eve_type=item):
+                    num_fitted += contained_item.quantity
                 if num_fitted >= quantity:
                     overlap += quantity
                 else:
@@ -187,16 +191,15 @@ class Fitting(models.Model):
         total_missing_modules = {}
 
         for ship, missing_items, hangar in misfits:
-            print missing_items
             for item, quantity in missing_items:
-                if not item.pk in total_missing_modules:
-                    total_missing_modules[item] = {'missing': 0,
+                if not item.typeName in total_missing_modules:
+                    total_missing_modules[item.typeName] = {'missing': 0,
                             'stocked': 0}
-                total_missing_modules[item]['missing'] += quantity
+                total_missing_modules[item.typeName]['missing'] += quantity
         for item_key in total_missing_modules.keys():
             items = Asset.objects.filter(stationID=self.group.stationID,
-                    eve_type=item_key, singleton=False)
+                    eve_type__typeName=item_key, singleton=False)
             aggregated = items.aggregate(models.Sum('quantity'))
             if aggregated['quantity__sum']:
-                total_missing_modules[item]['stocked'] = aggregated['quantity__sum']
+                total_missing_modules[item_key]['stocked'] = aggregated['quantity__sum']
         return total_missing_modules
