@@ -35,7 +35,6 @@ MENUS = [
 
 URL_PERMISSIONS = [
     r'^/stocks/.*$',
-    r'^/stocks/fitting/.*$',
 ]
 
 SETTINGS = {
