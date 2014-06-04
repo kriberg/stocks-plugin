@@ -42,7 +42,7 @@ def home(request):
 def fitting(request, fitting_id):
     fit = get_object_or_404(Fitting, pk=fitting_id)
     matching, misfits = fit.find_ships()
-    LOG.debug(misfits)
+    #LOG.debug(misfits)
     return render_to_response('ecm/stocks/fitting.html', {
         'fit': fit,
         'matching': matching,
