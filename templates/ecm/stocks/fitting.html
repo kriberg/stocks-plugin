@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load i18n %}
+{% load humanize %}
 {% load static from staticfiles %}
 
 {% block headtitle %}{% trans 'Stocks' %} {{ fit.name }}{% endblock %}
@@ -12,8 +13,22 @@
     {{ fit.group.location }}
 </div>
 
-<div class="span4">
+<div class="span5">
     <h3>Ships</h3>
+    <div class="accordion" id="accordion2">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                    EFT export
+                </a>
+            </div>
+            <div id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    {{ fit.eft_export|linebreaksbr}}
+                </div>
+            </div>
+        </div>
+    </div>
     <dl>
         <dt>Correctly fitted:</dt>
         {% for ship in matching %} 
@@ -31,7 +46,7 @@
                 <dl>
                     <dt>Missing:</dt>
                     {% for item, quantity in missing_items %}
-                    <dd>{{ quantity }}x {{ item }}</dd>
+                    <dd>{{ quantity|intcomma }}x {{ item }}</dd>
                     {% endfor %}
                 </dl>
             </dd>
@@ -40,7 +55,7 @@
         {% endfor %}
     </ul>
 </div>
-<div class="span6">
+<div class="span5">
     {% if fit.note %}
     <h3>Notes</h3>
     <pre>{{ fit.note }}</pre>
@@ -52,7 +67,7 @@
         </tr>
         {% for item, quantity in fit.accumulate_missing_items.items %}
         <tr>
-            <td>{{ item }}</td><td>{{ quantity.missing }}</td><td>{{ quantity.stocked }}</td>
+            <td>{{ item }}</td><td style="text-align: right;">{{ quantity.missing|intcomma }}</td><td style="text-align: right;">{{ quantity.stocked|intcomma }}</td>
         </tr>
         {% endfor %}
     </table>
